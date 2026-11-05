@@ -1,0 +1,29 @@
+services:
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  i3x-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: i3x-ollama-agent
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: qwen3:8b
+      I3X_BASE_URL: https://api.i3x.dev/v1
+      I3X_AUTH_SCHEME: none
+    depends_on:
+      - ollama
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
